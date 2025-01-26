@@ -1,20 +1,14 @@
-import Link from "next/link";
-import { visit } from "unist-util-visit";
-import { ReactNode } from "react";
-import { DrizzleClient } from "./db";
-import { SelectExample } from "./schema";
+import Link from 'next/link';
+import { visit } from 'unist-util-visit';
+import { ReactNode } from 'react';
+import { DrizzleClient } from './db';
+import { SelectExample } from './schema';
 
-export function replaceLinks({
-  href,
-  children,
-}: {
-  href?: string;
-  children: ReactNode;
-}) {
+export function replaceLinks({ href, children }: { href?: string; children: ReactNode }) {
   // this is technically not a remark plugin but it
   // replaces internal links with <Link /> component
   // and external links with <a target="_blank" />
-  return href?.startsWith("/") || href === "" ? (
+  return href?.startsWith('/') || href === '' ? (
     <Link href={href} className="cursor-pointer">
       {children}
     </Link>
@@ -30,7 +24,7 @@ export function replaceTweets() {
     new Promise<void>(async (resolve, reject) => {
       const nodesToChange = new Array();
 
-      visit(tree, "link", (node: any) => {
+      visit(tree, 'link', (node: any) => {
         if (
           node.url.match(
             /https?:\/\/twitter\.com\/(?:#!\/)?(\w+)\/status(?:es)?\/(\d+)([^\?])(\?.*)?/g,
@@ -50,17 +44,17 @@ export function replaceTweets() {
 
           const id = matches[1];
 
-          node.type = "mdxJsxFlowElement";
-          node.name = "Tweet";
+          node.type = 'mdxJsxFlowElement';
+          node.name = 'Tweet';
           node.attributes = [
             {
-              type: "mdxJsxAttribute",
-              name: "id",
+              type: 'mdxJsxAttribute',
+              name: 'id',
               value: id,
             },
           ];
         } catch (e) {
-          console.log("ERROR", e);
+          console.log('ERROR', e);
           return reject(e);
         }
       }
@@ -74,8 +68,8 @@ export function replaceExamples(drizzle: DrizzleClient) {
     new Promise<void>(async (resolve, reject) => {
       const nodesToChange = new Array();
 
-      visit(tree, "mdxJsxFlowElement", (node: any) => {
-        if (node.name == "Examples") {
+      visit(tree, 'mdxJsxFlowElement', (node: any) => {
+        if (node.name == 'Examples') {
           nodesToChange.push({
             node,
           });
@@ -86,8 +80,8 @@ export function replaceExamples(drizzle: DrizzleClient) {
           const data = await getExamples(node, drizzle);
           node.attributes = [
             {
-              type: "mdxJsxAttribute",
-              name: "data",
+              type: 'mdxJsxAttribute',
+              name: 'data',
               value: data,
             },
           ];
@@ -101,7 +95,7 @@ export function replaceExamples(drizzle: DrizzleClient) {
 }
 
 async function getExamples(node: any, drizzle: DrizzleClient) {
-  const names = node?.attributes[0].value.split(",");
+  const names = node?.attributes[0].value.split(',');
 
   // changed to | undefined (was null)
   const data = new Array<SelectExample | undefined>();

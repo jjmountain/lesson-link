@@ -1,26 +1,35 @@
-import { Suspense } from "react";
-import Sites from "@/components/sites";
-import OverviewStats from "@/components/overview-stats";
-import Posts from "@/components/posts";
-import Link from "next/link";
-import PlaceholderCard from "@/components/placeholder-card";
-import OverviewSitesCTA from "@/components/overview-sites-cta";
+import { Suspense } from 'react';
+import Sites from '@/components/sites';
+import OverviewStats from '@/components/overview-stats';
+import Posts from '@/components/posts';
+import Link from 'next/link';
+import PlaceholderCard from '@/components/placeholder-card';
+import OverviewSitesCTA from '@/components/overview-sites-cta';
+import { OrganizationSwitcher, ClerkLoading } from '@clerk/nextjs';
 
 export default function Overview() {
   return (
     <div className="flex max-w-screen-xl flex-col space-y-12 p-8">
-      <div className="flex flex-col space-y-6">
-        <h1 className="font-cal text-3xl font-bold dark:text-white">
-          Overview
-        </h1>
+      {/* <div className="flex flex-col space-y-6">
+        <h1 className="font-cal text-3xl font-bold dark:text-white">Overview</h1>
         <OverviewStats />
-      </div>
+      </div> */}
+      <ClerkLoading>
+        <div className="relative rounded-lg w-[500px] shadow-md transition-all">
+          <div className="h-[30px] w-full animate-pulse bg-stone-100" />
+        </div>
+      </ClerkLoading>
+      <OrganizationSwitcher
+        appearance={{
+          elements: {
+            rootBox: 'flex',
+          },
+        }}
+      />
 
       <div className="flex flex-col space-y-6">
         <div className="flex items-center justify-between">
-          <h1 className="font-cal text-3xl font-bold dark:text-white">
-            Top Sites
-          </h1>
+          <h1 className="font-cal text-3xl font-bold dark:text-white">Top Sites</h1>
           <Suspense fallback={null}>
             <OverviewSitesCTA />
           </Suspense>
@@ -39,9 +48,7 @@ export default function Overview() {
       </div>
 
       <div className="flex flex-col space-y-6">
-        <h1 className="font-cal text-3xl font-bold dark:text-white">
-          Recent Posts
-        </h1>
+        <h1 className="font-cal text-3xl font-bold dark:text-white">Recent Posts</h1>
         <Suspense
           fallback={
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">

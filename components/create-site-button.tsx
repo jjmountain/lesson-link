@@ -1,13 +1,9 @@
-"use client";
+'use client';
 
-import { useModal } from "@/components/modal/provider";
-import { ReactNode } from "react";
+import { useModal } from '@/components/modal/provider';
+import { ReactNode } from 'react';
 
-export default function CreateSiteButton({
-  children,
-}: {
-  children: ReactNode;
-}) {
+export default function CreateSiteButton({ children }: { children: ReactNode }) {
   const modal = useModal();
   return (
     <button

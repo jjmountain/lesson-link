@@ -1,12 +1,12 @@
-import Link from "next/link";
-import BlurImage from "./blur-image";
-import { placeholderBlurhash, toDateString } from "@/lib/utils";
-import type { SelectPost } from "@/lib/schema";
+import Link from 'next/link';
+import BlurImage from './blur-image';
+import { placeholderBlurhash, toDateString } from '@/lib/utils';
+import type { SelectPost } from '@/lib/schema';
 
 interface BlogCardProps {
   data: Pick<
     SelectPost,
-    "slug" | "image" | "imageBlurhash" | "title" | "description" | "createdAt"
+    'slug' | 'image' | 'imageBlurhash' | 'title' | 'description' | 'createdAt'
   >;
 }
 
@@ -16,7 +16,7 @@ export default function BlogCard({ data }: BlogCardProps) {
       <div className="ease overflow-hidden rounded-2xl border-2 border-stone-100 bg-white shadow-md transition-all duration-200 hover:-translate-y-1 hover:shadow-xl dark:border-stone-800">
         <BlurImage
           src={data.image!}
-          alt={data.title ?? "Blog Post"}
+          alt={data.title ?? 'Blog Post'}
           width={500}
           height={400}
           className="h-64 w-full object-cover"

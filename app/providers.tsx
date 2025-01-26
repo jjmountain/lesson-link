@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import { ClerkProvider } from "@clerk/nextjs";
-import { Toaster } from "sonner";
-import { ModalProvider } from "@/components/modal/provider";
+import { ClerkProvider } from '@clerk/nextjs';
+import { Toaster } from 'sonner';
+import { ModalProvider } from '@/components/modal/provider';
 
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
@@ -11,5 +11,8 @@ export function Providers({ children }: { children: React.ReactNode }) {
       <Toaster theme="dark" className="hidden dark:block" />
       <ModalProvider>{children}</ModalProvider>
     </ClerkProvider>
+
+
+
   );
 }

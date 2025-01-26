@@ -1,12 +1,12 @@
-import { notFound } from "next/navigation";
-import { getPostData, getSiteData } from "@/lib/fetchers";
-import BlogCard from "@/components/blog-card";
-import BlurImage from "@/components/blur-image";
-import MDX from "@/components/mdx";
-import { placeholderBlurhash, toDateString } from "@/lib/utils";
-import db from "@/lib/db";
-import { posts, sites } from "@/lib/schema";
-import { eq } from "drizzle-orm";
+import { notFound } from 'next/navigation';
+import { getPostData, getSiteData } from '@/lib/fetchers';
+import BlogCard from '@/components/blog-card';
+import BlurImage from '@/components/blur-image';
+import MDX from '@/components/mdx';
+import { placeholderBlurhash, toDateString } from '@/lib/utils';
+import db from '@/lib/db';
+import { posts, sites } from '@/lib/schema';
+import { eq } from 'drizzle-orm';
 
 export async function generateMetadata({
   params,
@@ -33,10 +33,10 @@ export async function generateMetadata({
       description,
     },
     twitter: {
-      card: "summary_large_image",
+      card: 'summary_large_image',
       title,
       description,
-      creator: "@vercel",
+      creator: '@vercel',
     },
     // Optional: Set canonical URL to custom domain if it exists
     // ...(params.domain.endsWith(`.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`) &&
@@ -59,7 +59,7 @@ export async function generateStaticParams() {
     })
     .from(posts)
     .leftJoin(sites, eq(posts.siteId, sites.id))
-    .where(eq(sites.subdomain, "demo")); // feel free to remove this filter if you want to generate paths for all posts
+    .where(eq(sites.subdomain, 'demo')); // feel free to remove this filter if you want to generate paths for all posts
 
   const allPaths = allPosts
     .flatMap(({ site, slug }) => [
@@ -107,13 +107,13 @@ export default async function SitePostPage({
       </div>
       <div className="relative m-auto mb-10 h-80 w-full max-w-screen-lg overflow-hidden md:mb-20 md:h-150 md:w-5/6 md:rounded-2xl lg:w-2/3">
         <BlurImage
-          alt={data.title ?? "Post image"}
+          alt={data.title ?? 'Post image'}
           width={1200}
           height={630}
           className="h-full w-full object-cover"
           placeholder="blur"
           blurDataURL={data.imageBlurhash ?? placeholderBlurhash}
-          src={data.image ?? "/placeholder.png"}
+          src={data.image ?? '/placeholder.png'}
         />
       </div>
 
@@ -121,10 +121,7 @@ export default async function SitePostPage({
 
       {data.adjacentPosts.length > 0 && (
         <div className="relative mb-20 mt-10 sm:mt-20">
-          <div
-            className="absolute inset-0 flex items-center"
-            aria-hidden="true"
-          >
+          <div className="absolute inset-0 flex items-center" aria-hidden="true">
             <div className="w-full border-t border-stone-300 dark:border-stone-700" />
           </div>
           <div className="relative flex justify-center">

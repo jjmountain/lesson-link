@@ -1,22 +1,16 @@
-import { currentUser } from '@clerk/nextjs/server'
-import db from "./db";
-
-const VERCEL_DEPLOYMENT = !!process.env.VERCEL_URL;
+import { currentUser } from '@clerk/nextjs/server';
+import db from './db';
 
 export function getUser() {
   return currentUser();
 }
 
 export function withSiteAuth(action: any) {
-  return async (
-    formData: FormData | null,
-    siteId: string,
-    key: string | null,
-  ) => {
+  return async (formData: FormData | null, siteId: string, key: string | null) => {
     const user = await getUser();
     if (!user) {
       return {
-        error: "Not authenticated",
+        error: 'Not authenticated',
       };
     }
 
@@ -26,7 +20,7 @@ export function withSiteAuth(action: any) {
 
     if (!site || site.userId !== user.id) {
       return {
-        error: "Not authorized",
+        error: 'Not authorized',
       };
     }
 
@@ -35,15 +29,11 @@ export function withSiteAuth(action: any) {
 }
 
 export function withPostAuth(action: any) {
-  return async (
-    formData: FormData | null,
-    postId: string,
-    key: string | null,
-  ) => {
+  return async (formData: FormData | null, postId: string, key: string | null) => {
     const user = await getUser();
     if (!user?.id) {
       return {
-        error: "Not authenticated",
+        error: 'Not authenticated',
       };
     }
 
@@ -56,7 +46,7 @@ export function withPostAuth(action: any) {
 
     if (!post || post.userId !== user.id) {
       return {
-        error: "Post not found",
+        error: 'Post not found',
       };
     }
 

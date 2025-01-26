@@ -4,22 +4,22 @@
 module.exports = {
   experimental: {
     serverActions: {
-      allowedOrigins: ["app.localhost:3001"],
+      allowedOrigins: ['app.localhost:3001'],
     },
   },
   images: {
     remotePatterns: [
-      { hostname: "public.blob.vercel-storage.com" },
-      { hostname: "res.cloudinary.com" },
-      { hostname: "abs.twimg.com" },
-      { hostname: "pbs.twimg.com" },
-      { hostname: "avatar.vercel.sh" },
-      { hostname: "avatars.githubusercontent.com" },
-      { hostname: "www.google.com" },
-      { hostname: "flag.vercel.app" },
-      { hostname: "illustrations.popsy.co" },
-      { hostname: "img.clerk.com"},
-      { hostname: "dofoprz7gttyjdkw.public.blob.vercel-storage.com"}
+      { hostname: 'public.blob.vercel-storage.com' },
+      { hostname: 'res.cloudinary.com' },
+      { hostname: 'abs.twimg.com' },
+      { hostname: 'pbs.twimg.com' },
+      { hostname: 'avatar.vercel.sh' },
+      { hostname: 'avatars.githubusercontent.com' },
+      { hostname: 'www.google.com' },
+      { hostname: 'flag.vercel.app' },
+      { hostname: 'illustrations.popsy.co' },
+      { hostname: 'img.clerk.com' },
+      { hostname: 'dofoprz7gttyjdkw.public.blob.vercel-storage.com' },
     ],
   },
 };

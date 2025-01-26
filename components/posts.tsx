@@ -1,8 +1,8 @@
-import { getUser } from "@/lib/auth";
-import db from "@/lib/db";
-import Image from "next/image";
-import { redirect } from "next/navigation";
-import PostCard from "./post-card";
+import { getUser } from '@/lib/auth';
+import db from '@/lib/db';
+import Image from 'next/image';
+import { redirect } from 'next/navigation';
+import PostCard from './post-card';
 
 export default async function Posts({
   siteId,
@@ -13,15 +13,12 @@ export default async function Posts({
 }) {
   const user = await getUser();
   if (!user?.id) {
-    redirect("/login");
+    redirect('/login');
   }
 
   const posts = await db.query.posts.findMany({
     where: (posts, { and, eq }) =>
-      and(
-        eq(posts.userId, user.id),
-        siteId ? eq(posts.siteId, siteId) : undefined,
-      ),
+      and(eq(posts.userId, user.id), siteId ? eq(posts.siteId, siteId) : undefined),
     with: {
       site: true,
     },

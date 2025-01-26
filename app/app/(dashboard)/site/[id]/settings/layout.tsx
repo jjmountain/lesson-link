@@ -1,8 +1,8 @@
-import { ReactNode } from "react";
-import { getUser } from "@/lib/auth";
-import { notFound, redirect } from "next/navigation";
-import SiteSettingsNav from "./nav";
-import db from "@/lib/db";
+import { ReactNode } from 'react';
+import { getUser } from '@/lib/auth';
+import { notFound, redirect } from 'next/navigation';
+import SiteSettingsNav from './nav';
+import db from '@/lib/db';
 
 export default async function SiteAnalyticsLayout({
   params,
@@ -13,7 +13,7 @@ export default async function SiteAnalyticsLayout({
 }) {
   const user = await getUser();
   if (!user) {
-    redirect("/login");
+    redirect('/login');
   }
   const data = await db.query.sites.findFirst({
     where: (sites, { eq }) => eq(sites.id, decodeURIComponent(params.id)),

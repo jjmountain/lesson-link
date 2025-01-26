@@ -1,13 +1,13 @@
-import { unstable_cache } from "next/cache";
-import db from "./db";
-import { and, desc, eq, not } from "drizzle-orm";
-import { posts, sites, users } from "./schema";
-import { serialize } from "next-mdx-remote/serialize";
-import { replaceExamples, replaceTweets } from "@/lib/remark-plugins";
+import { unstable_cache } from 'next/cache';
+import db from './db';
+import { and, desc, eq, not } from 'drizzle-orm';
+import { posts, sites, users } from './schema';
+import { serialize } from 'next-mdx-remote/serialize';
+import { replaceExamples, replaceTweets } from '@/lib/remark-plugins';
 
 export async function getSiteData(domain: string) {
   const subdomain = domain.endsWith(`.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`)
-    ? domain.replace(`.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`, "")
+    ? domain.replace(`.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`, '')
     : null;
 
   return await unstable_cache(
@@ -31,7 +31,7 @@ export async function getSiteData(domain: string) {
 
 export async function getPostsForSite(domain: string) {
   const subdomain = domain.endsWith(`.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`)
-    ? domain.replace(`.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`, "")
+    ? domain.replace(`.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`, '')
     : null;
 
   return await unstable_cache(
@@ -50,9 +50,7 @@ export async function getPostsForSite(domain: string) {
         .where(
           and(
             eq(posts.published, true),
-            subdomain
-              ? eq(sites.subdomain, subdomain)
-              : eq(sites.customDomain, domain),
+            subdomain ? eq(sites.subdomain, subdomain) : eq(sites.customDomain, domain),
           ),
         )
         .orderBy(desc(posts.createdAt));
@@ -67,7 +65,7 @@ export async function getPostsForSite(domain: string) {
 
 export async function getPostData(domain: string, slug: string) {
   const subdomain = domain.endsWith(`.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`)
-    ? domain.replace(`.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`, "")
+    ? domain.replace(`.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`, '')
     : null;
 
   return await unstable_cache(
@@ -85,9 +83,7 @@ export async function getPostData(domain: string, slug: string) {
           and(
             eq(posts.slug, slug),
             eq(posts.published, true),
-            subdomain
-              ? eq(sites.subdomain, subdomain)
-              : eq(sites.customDomain, domain),
+            subdomain ? eq(sites.subdomain, subdomain) : eq(sites.customDomain, domain),
           ),
         )
         .then((res) =>
@@ -123,9 +119,7 @@ export async function getPostData(domain: string, slug: string) {
             and(
               eq(posts.published, true),
               not(eq(posts.id, data.id)),
-              subdomain
-                ? eq(sites.subdomain, subdomain)
-                : eq(sites.customDomain, domain),
+              subdomain ? eq(sites.subdomain, subdomain) : eq(sites.customDomain, domain),
             ),
           ),
       ]);
@@ -147,8 +141,7 @@ export async function getPostData(domain: string, slug: string) {
 async function getMdxSource(postContents: string) {
   // transforms links like <link> to [link](link) as MDX doesn't support <link> syntax
   // https://mdxjs.com/docs/what-is-mdx/#markdown
-  const content =
-    postContents?.replaceAll(/<(https?:\/\/\S+)>/g, "[$1]($1)") ?? "";
+  const content = postContents?.replaceAll(/<(https?:\/\/\S+)>/g, '[$1]($1)') ?? '';
   // Serialize the content string into MDX
   const mdxSource = await serialize(content, {
     mdxOptions: {

@@ -1,16 +1,16 @@
-import Link from "next/link";
-import { notFound } from "next/navigation";
-import BlurImage from "@/components/blur-image";
-import { placeholderBlurhash, toDateString } from "@/lib/utils";
-import BlogCard from "@/components/blog-card";
-import { getPostsForSite, getSiteData } from "@/lib/fetchers";
-import Image from "next/image";
-import db from "@/lib/db";
+import Link from 'next/link';
+import { notFound } from 'next/navigation';
+import BlurImage from '@/components/blur-image';
+import { placeholderBlurhash, toDateString } from '@/lib/utils';
+import BlogCard from '@/components/blog-card';
+import { getPostsForSite, getSiteData } from '@/lib/fetchers';
+import Image from 'next/image';
+import db from '@/lib/db';
 
 export async function generateStaticParams() {
   const allSites = await db.query.sites.findMany({
     // feel free to remove this filter if you want to generate paths for all sites
-    where: (sites, { eq }) => eq(sites.subdomain, "demo"),
+    where: (sites, { eq }) => eq(sites.subdomain, 'demo'),
     columns: {
       subdomain: true,
       customDomain: true,
@@ -31,16 +31,9 @@ export async function generateStaticParams() {
   return allPaths;
 }
 
-export default async function SiteHomePage({
-  params,
-}: {
-  params: { domain: string };
-}) {
+export default async function SiteHomePage({ params }: { params: { domain: string } }) {
   const domain = decodeURIComponent(params.domain);
-  const [data, posts] = await Promise.all([
-    getSiteData(domain),
-    getPostsForSite(domain),
-  ]);
+  const [data, posts] = await Promise.all([getSiteData(domain), getPostsForSite(domain)]);
 
   if (!data) {
     notFound();
@@ -54,13 +47,13 @@ export default async function SiteHomePage({
             <Link href={`/${posts[0].slug}`}>
               <div className="group relative mx-auto h-80 w-full overflow-hidden sm:h-150 lg:rounded-xl">
                 <BlurImage
-                  alt={posts[0].title ?? ""}
+                  alt={posts[0].title ?? ''}
                   blurDataURL={posts[0].imageBlurhash ?? placeholderBlurhash}
                   className="h-full w-full object-cover group-hover:scale-105 group-hover:duration-300"
                   width={1300}
                   height={630}
                   placeholder="blur"
-                  src={posts[0].image ?? "/placeholder.png"}
+                  src={posts[0].image ?? '/placeholder.png'}
                 />
               </div>
               <div className="mx-auto mt-10 w-5/6 lg:w-full">
@@ -74,7 +67,7 @@ export default async function SiteHomePage({
                   <div className="relative h-8 w-8 flex-none overflow-hidden rounded-full">
                     {data.user?.image ? (
                       <BlurImage
-                        alt={data.user?.firstName ?? "User Avatar"}
+                        alt={data.user?.firstName ?? 'User Avatar'}
                         width={100}
                         height={100}
                         className="h-full w-full object-cover"

@@ -1,22 +1,22 @@
-"use server";
+'use server';
 
-import { getUser } from "@/lib/auth";
+import { getUser } from '@/lib/auth';
 import {
   addDomainToVercel,
   removeDomainFromVercelProject,
   validDomainRegex,
-} from "@/lib/domains";
-import { getBlurDataURL } from "@/lib/utils";
-import { put } from "@vercel/blob";
-import { eq } from "drizzle-orm";
-import { customAlphabet } from "nanoid";
-import { revalidateTag } from "next/cache";
-import { withPostAuth, withSiteAuth } from "./auth";
-import db from "./db";
-import { SelectPost, SelectSite, posts, sites, users } from "./schema";
+} from '@/lib/domains';
+import { getBlurDataURL } from '@/lib/utils';
+import { put } from '@vercel/blob';
+import { eq } from 'drizzle-orm';
+import { customAlphabet } from 'nanoid';
+import { revalidateTag } from 'next/cache';
+import { withPostAuth, withSiteAuth } from './auth';
+import db from './db';
+import { SelectPost, SelectSite, posts, sites, users } from './schema';
 
 const nanoid = customAlphabet(
-  "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz",
+  '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz',
   7,
 ); // 7-character random string
 
@@ -24,12 +24,12 @@ export const createSite = async (formData: FormData) => {
   const user = await getUser();
   if (!user?.id) {
     return {
-      error: "Not authenticated",
+      error: 'Not authenticated',
     };
   }
-  const name = formData.get("name") as string;
-  const description = formData.get("description") as string;
-  const subdomain = formData.get("subdomain") as string;
+  const name = formData.get('name') as string;
+  const description = formData.get('description') as string;
+  const subdomain = formData.get('subdomain') as string;
 
   try {
     const [response] = await db
@@ -42,12 +42,10 @@ export const createSite = async (formData: FormData) => {
       })
       .returning();
 
-    revalidateTag(
-      `${subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}-metadata`,
-    );
+    revalidateTag(`${subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}-metadata`);
     return response;
   } catch (error: any) {
-    if (error.code === "P2002") {
+    if (error.code === 'P2002') {
       return {
         error: `This subdomain is already taken`,
       };
@@ -66,10 +64,10 @@ export const updateSite = withSiteAuth(
     try {
       let response;
 
-      if (key === "customDomain") {
-        if (value.includes("vercel.pub")) {
+      if (key === 'customDomain') {
+        if (value.includes('vercel.pub')) {
           return {
-            error: "Cannot use vercel.pub subdomain as your custom domain",
+            error: 'Cannot use vercel.pub subdomain as your custom domain',
           };
 
           // if the custom domain is valid, we need to add it to Vercel
@@ -90,7 +88,7 @@ export const updateSite = withSiteAuth(
           ]);
 
           // empty value means the user wants to remove the custom domain
-        } else if (value === "") {
+        } else if (value === '') {
           response = await db
             .update(sites)
             .set({
@@ -126,22 +124,22 @@ export const updateSite = withSiteAuth(
           
           */
         }
-      } else if (key === "image" || key === "logo") {
+      } else if (key === 'image' || key === 'logo') {
         if (!process.env.BLOB_READ_WRITE_TOKEN) {
           return {
             error:
-              "Missing BLOB_READ_WRITE_TOKEN token. Note: Vercel Blob is currently in beta – please fill out this form for access: https://tally.so/r/nPDMNd",
+              'Missing BLOB_READ_WRITE_TOKEN token. Note: Vercel Blob is currently in beta – please fill out this form for access: https://tally.so/r/nPDMNd',
           };
         }
 
         const file = formData.get(key) as File;
-        const filename = `${nanoid()}.${file.type.split("/")[1]}`;
+        const filename = `${nanoid()}.${file.type.split('/')[1]}`;
 
         const { url } = await put(filename, file, {
-          access: "public",
+          access: 'public',
         });
 
-        const blurhash = key === "image" ? await getBlurDataURL(url) : null;
+        const blurhash = key === 'image' ? await getBlurDataURL(url) : null;
 
         response = await db
           .update(sites)
@@ -164,18 +162,16 @@ export const updateSite = withSiteAuth(
       }
 
       console.log(
-        "Updated site data! Revalidating tags: ",
+        'Updated site data! Revalidating tags: ',
         `${site.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}-metadata`,
         `${site.customDomain}-metadata`,
       );
-      revalidateTag(
-        `${site.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}-metadata`,
-      );
+      revalidateTag(`${site.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}-metadata`);
       site.customDomain && revalidateTag(`${site.customDomain}-metadata`);
 
       return response;
     } catch (error: any) {
-      if (error.code === "P2002") {
+      if (error.code === 'P2002') {
         return {
           error: `This ${key} is already taken`,
         };
@@ -188,26 +184,19 @@ export const updateSite = withSiteAuth(
   },
 );
 
-export const deleteSite = withSiteAuth(
-  async (_: FormData, site: SelectSite) => {
-    try {
-      const [response] = await db
-        .delete(sites)
-        .where(eq(sites.id, site.id))
-        .returning();
+export const deleteSite = withSiteAuth(async (_: FormData, site: SelectSite) => {
+  try {
+    const [response] = await db.delete(sites).where(eq(sites.id, site.id)).returning();
 
-      revalidateTag(
-        `${site.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}-metadata`,
-      );
-      response.customDomain && revalidateTag(`${site.customDomain}-metadata`);
-      return response;
-    } catch (error: any) {
-      return {
-        error: error.message,
-      };
-    }
-  },
-);
+    revalidateTag(`${site.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}-metadata`);
+    response.customDomain && revalidateTag(`${site.customDomain}-metadata`);
+    return response;
+  } catch (error: any) {
+    return {
+      error: error.message,
+    };
+  }
+});
 
 export const getSiteFromPostId = async (postId: string) => {
   const post = await db.query.posts.findFirst({
@@ -220,38 +209,34 @@ export const getSiteFromPostId = async (postId: string) => {
   return post?.siteId;
 };
 
-export const createPost = withSiteAuth(
-  async (_: FormData, site: SelectSite) => {
-    const user = await getUser();
-    if (!user?.id) {
-      return {
-        error: "Not authenticated",
-      };
-    }
+export const createPost = withSiteAuth(async (_: FormData, site: SelectSite) => {
+  const user = await getUser();
+  if (!user?.id) {
+    return {
+      error: 'Not authenticated',
+    };
+  }
 
-    const [response] = await db
-      .insert(posts)
-      .values({
-        siteId: site.id,
-        userId: user.id,
-      })
-      .returning();
+  const [response] = await db
+    .insert(posts)
+    .values({
+      siteId: site.id,
+      userId: user.id,
+    })
+    .returning();
 
-    revalidateTag(
-      `${site.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}-posts`,
-    );
-    site.customDomain && revalidateTag(`${site.customDomain}-posts`);
+  revalidateTag(`${site.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}-posts`);
+  site.customDomain && revalidateTag(`${site.customDomain}-posts`);
 
-    return response;
-  },
-);
+  return response;
+});
 
 // creating a separate function for this because we're not using FormData
 export const updatePost = async (data: SelectPost) => {
   const user = await getUser();
   if (!user?.id) {
     return {
-      error: "Not authenticated",
+      error: 'Not authenticated',
     };
   }
 
@@ -264,7 +249,7 @@ export const updatePost = async (data: SelectPost) => {
 
   if (!post || post.userId !== user.id) {
     return {
-      error: "Post not found",
+      error: 'Post not found',
     };
   }
 
@@ -279,9 +264,7 @@ export const updatePost = async (data: SelectPost) => {
       .where(eq(posts.id, data.id))
       .returning();
 
-    revalidateTag(
-      `${post.site?.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}-posts`,
-    );
+    revalidateTag(`${post.site?.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}-posts`);
     revalidateTag(
       `${post.site?.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}-${post.slug}`,
     );
@@ -311,12 +294,12 @@ export const updatePostMetadata = withPostAuth(
 
     try {
       let response;
-      if (key === "image") {
-        const file = formData.get("image") as File;
-        const filename = `${nanoid()}.${file.type.split("/")[1]}`;
+      if (key === 'image') {
+        const file = formData.get('image') as File;
+        const filename = `${nanoid()}.${file.type.split('/')[1]}`;
 
         const { url } = await put(filename, file, {
-          access: "public",
+          access: 'public',
         });
 
         const blurhash = await getBlurDataURL(url);
@@ -333,7 +316,7 @@ export const updatePostMetadata = withPostAuth(
         response = await db
           .update(posts)
           .set({
-            [key]: key === "published" ? value === "true" : value,
+            [key]: key === 'published' ? value === 'true' : value,
           })
           .where(eq(posts.id, post.id))
           .returning()
@@ -354,7 +337,7 @@ export const updatePostMetadata = withPostAuth(
 
       return response;
     } catch (error: any) {
-      if (error.code === "P2002") {
+      if (error.code === 'P2002') {
         return {
           error: `This slug is already in use`,
         };
@@ -367,34 +350,25 @@ export const updatePostMetadata = withPostAuth(
   },
 );
 
-export const deletePost = withPostAuth(
-  async (_: FormData, post: SelectPost) => {
-    try {
-      const [response] = await db
-        .delete(posts)
-        .where(eq(posts.id, post.id))
-        .returning({
-          siteId: posts.siteId,
-        });
+export const deletePost = withPostAuth(async (_: FormData, post: SelectPost) => {
+  try {
+    const [response] = await db.delete(posts).where(eq(posts.id, post.id)).returning({
+      siteId: posts.siteId,
+    });
 
-      return response;
-    } catch (error: any) {
-      return {
-        error: error.message,
-      };
-    }
-  },
-);
+    return response;
+  } catch (error: any) {
+    return {
+      error: error.message,
+    };
+  }
+});
 
-export const editUser = async (
-  formData: FormData,
-  _id: unknown,
-  key: string,
-) => {
+export const editUser = async (formData: FormData, _id: unknown, key: string) => {
   const user = await getUser();
   if (!user?.id) {
     return {
-      error: "Not authenticated",
+      error: 'Not authenticated',
     };
   }
   const value = formData.get(key) as string;
@@ -410,7 +384,7 @@ export const editUser = async (
 
     return response;
   } catch (error: any) {
-    if (error.code === "P2002") {
+    if (error.code === 'P2002') {
       return {
         error: `This ${key} is already in use`,
       };

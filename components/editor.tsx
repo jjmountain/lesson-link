@@ -1,14 +1,16 @@
-"use client";
+'use client';
 
-import { useEffect, useState, useTransition } from "react";
-import { updatePost, updatePostMetadata } from "@/lib/actions";
-import { Editor as NovelEditor } from "novel";
-import TextareaAutosize from "react-textarea-autosize";
-import { cn } from "@/lib/utils";
-import LoadingDots from "./icons/loading-dots";
-import { ExternalLink } from "lucide-react";
-import { toast } from "sonner";
-import type { SelectPost } from "@/lib/schema";
+import { useEffect, useState, useTransition, useRef, useCallback } from 'react';
+import { updatePost, updatePostMetadata } from '@/lib/actions';
+import { Editor as NovelEditor } from 'novel';
+import TextareaAutosize from 'react-textarea-autosize';
+import { cn } from '@/lib/utils';
+import LoadingDots from './icons/loading-dots';
+import { ExternalLink } from 'lucide-react';
+import { toast } from 'sonner';
+import type { SelectPost } from '@/lib/schema';
+import _ from 'lodash';
+import clsx from 'clsx';
 
 type PostWithSite = SelectPost & { site: { subdomain: string | null } | null };
 
@@ -17,30 +19,59 @@ export default function Editor({ post }: { post: PostWithSite }) {
   let [isPendingPublishing, startTransitionPublishing] = useTransition();
   const [data, setData] = useState<PostWithSite>(post);
   const [hydrated, setHydrated] = useState(false);
-
-  console.log('vercel env', process.env.NEXT_PUBLIC_VERCEL_ENV)
-  console.log('url', `http://${data.site?.subdomain}.localhost:3001/${data.slug}`)
-
   const url = process.env.NEXT_PUBLIC_VERCEL_ENV
     ? `https://${data.site?.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/${data.slug}`
     : `http://${data.site?.subdomain}.localhost:3001/${data.slug}`;
+  const debouncedUpdate = useRef(
+    _.debounce((data: PostWithSite, originalPost: PostWithSite) => {
+      if (
+        data.title === originalPost.title &&
+        data.description === originalPost.description &&
+        data.content === originalPost.content
+      )
+        return;
 
-  console.log('Generated URL:', url);
+      startTransitionSaving(async () => {
+        await updatePost(data);
+      });
+    }, 2000),
+  ).current;
 
-  // listen to CMD + S and override the default behavior
+  // Keep original post reference updated
+  const postRef = useRef(post);
+  useEffect(() => {
+    postRef.current = post;
+  }, [post]);
+
+  // Cancel debounce on unmount
+  useEffect(() => {
+    return () => debouncedUpdate.cancel();
+  }, [debouncedUpdate]);
+
+  // Update handler for all fields
+  const handleUpdate = useCallback(
+    (newData: Partial<PostWithSite>) => {
+      setData((prev) => {
+        const updated = { ...prev, ...newData };
+        debouncedUpdate(updated, postRef.current);
+        return updated;
+      });
+    },
+    [debouncedUpdate],
+  );
+
+  // Listen to CMD + S and override the default behavior
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
-      if (e.metaKey && e.key === "s") {
+      if (e.metaKey && e.key === 's') {
         e.preventDefault();
         startTransitionSaving(async () => {
           await updatePost(data);
         });
       }
     };
-    document.addEventListener("keydown", onKeyDown);
-    return () => {
-      document.removeEventListener("keydown", onKeyDown);
-    };
+    document.addEventListener('keydown', onKeyDown);
+    return () => document.removeEventListener('keydown', onKeyDown);
   }, [data, startTransitionSaving]);
 
   return (
@@ -56,39 +87,44 @@ export default function Editor({ post }: { post: PostWithSite }) {
             <ExternalLink className="h-4 w-4" />
           </a>
         )}
-        <div className="rounded-lg bg-stone-100 px-2 py-1 text-sm text-stone-400 dark:bg-stone-800 dark:text-stone-500">
-          {isPendingSaving ? "Saving..." : "Saved"}
+        <div
+          className={clsx(
+            'rounded-lg px-2 py-1 text-sm dark:bg-stone-800 dark:text-stone-500',
+            isPendingSaving
+              ? 'bg-yellow-100 text-stone-600'
+              : 'bg-stone-100 text-stone-400',
+          )}
+        >
+          {isPendingSaving ? 'Saving...' : 'Saved'}
         </div>
         <button
           onClick={() => {
             const formData = new FormData();
             console.log(data.published, typeof data.published);
-            formData.append("published", String(!data.published));
+            formData.append('published', String(!data.published));
             startTransitionPublishing(async () => {
-              await updatePostMetadata(formData, post.id, "published").then(
-                () => {
-                  toast.success(
-                    `Successfully ${
-                      data.published ? "unpublished" : "published"
-                    } your post.`,
-                  );
-                  setData((prev) => ({ ...prev, published: !prev.published }));
-                },
-              );
+              await updatePostMetadata(formData, post.id, 'published').then(() => {
+                toast.success(
+                  `Successfully ${
+                    data.published ? 'unpublished' : 'published'
+                  } your post.`,
+                );
+                setData((prev) => ({ ...prev, published: !prev.published }));
+              });
             });
           }}
           className={cn(
-            "flex h-7 w-24 items-center justify-center space-x-2 rounded-lg border text-sm transition-all focus:outline-none",
+            'flex h-7 w-24 items-center justify-center space-x-2 rounded-lg border text-sm transition-all focus:outline-none',
             isPendingPublishing
-              ? "cursor-not-allowed border-stone-200 bg-stone-100 text-stone-400 dark:border-stone-700 dark:bg-stone-800 dark:text-stone-300"
-              : "border border-black bg-black text-white hover:bg-white hover:text-black active:bg-stone-100 dark:border-stone-700 dark:hover:border-stone-200 dark:hover:bg-black dark:hover:text-white dark:active:bg-stone-800",
+              ? 'cursor-not-allowed border-stone-200 bg-stone-100 text-stone-400 dark:border-stone-700 dark:bg-stone-800 dark:text-stone-300'
+              : 'border border-black bg-black text-white hover:bg-white hover:text-black active:bg-stone-100 dark:border-stone-700 dark:hover:border-stone-200 dark:hover:bg-black dark:hover:text-white dark:active:bg-stone-800',
           )}
           disabled={isPendingPublishing}
         >
           {isPendingPublishing ? (
             <LoadingDots />
           ) : (
-            <p>{data.published ? "Unpublish" : "Publish"}</p>
+            <p>{data.published ? 'Unpublish' : 'Publish'}</p>
           )}
         </button>
       </div>
@@ -96,37 +132,25 @@ export default function Editor({ post }: { post: PostWithSite }) {
         <input
           type="text"
           placeholder="Title"
-          defaultValue={post?.title || ""}
+          defaultValue={post?.title || ''}
           autoFocus
-          onChange={(e) => setData({ ...data, title: e.target.value })}
+          onChange={(e) => handleUpdate({ title: e.target.value })}
           className="dark:placeholder-text-600 border-none px-0 font-cal text-3xl placeholder:text-stone-400 focus:outline-none focus:ring-0 dark:bg-black dark:text-white"
         />
         <TextareaAutosize
           placeholder="Description"
-          defaultValue={post?.description || ""}
-          onChange={(e) => setData({ ...data, description: e.target.value })}
+          defaultValue={post?.description || ''}
+          onChange={(e) => handleUpdate({ description: e.target.value })}
           className="dark:placeholder-text-600 w-full resize-none border-none px-0 placeholder:text-stone-400 focus:outline-none focus:ring-0 dark:bg-black dark:text-white"
         />
       </div>
+
       <NovelEditor
         className="relative block"
         defaultValue={post?.content || undefined}
         onUpdate={(editor) => {
-          setData((prev) => ({
-            ...prev,
+          handleUpdate({
             content: editor?.storage.markdown.getMarkdown(),
-          }));
-        }}
-        onDebouncedUpdate={() => {
-          if (
-            data.title === post.title &&
-            data.description === post.description &&
-            data.content === post.content
-          ) {
-            return;
-          }
-          startTransitionSaving(async () => {
-            await updatePost(data);
           });
         }}
       />

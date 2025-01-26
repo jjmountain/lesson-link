@@ -1,16 +1,12 @@
-import { getUser } from "@/lib/auth";
-import { notFound, redirect } from "next/navigation";
-import AnalyticsMockup from "@/components/analytics";
-import db from "@/lib/db";
+import { getUser } from '@/lib/auth';
+import { notFound, redirect } from 'next/navigation';
+import AnalyticsMockup from '@/components/analytics';
+import db from '@/lib/db';
 
-export default async function SiteAnalytics({
-  params,
-}: {
-  params: { id: string };
-}) {
+export default async function SiteAnalytics({ params }: { params: { id: string } }) {
   const user = await getUser();
   if (!user) {
-    redirect("/login");
+    redirect('/login');
   }
   const data = await db.query.sites.findFirst({
     where: (sites, { eq }) => eq(sites.id, decodeURIComponent(params.id)),
