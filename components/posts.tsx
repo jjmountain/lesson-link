@@ -1,4 +1,4 @@
-import { getSession } from "@/lib/auth";
+import { getUser } from "@/lib/auth";
 import db from "@/lib/db";
 import Image from "next/image";
 import { redirect } from "next/navigation";
@@ -11,15 +11,15 @@ export default async function Posts({
   siteId?: string;
   limit?: number;
 }) {
-  const session = await getSession();
-  if (!session?.user) {
+  const user = await getUser();
+  if (!user?.id) {
     redirect("/login");
   }
 
   const posts = await db.query.posts.findMany({
     where: (posts, { and, eq }) =>
       and(
-        eq(posts.userId, session.user.id),
+        eq(posts.userId, user.id),
         siteId ? eq(posts.siteId, siteId) : undefined,
       ),
     with: {

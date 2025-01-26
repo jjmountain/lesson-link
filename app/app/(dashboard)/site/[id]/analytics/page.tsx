@@ -1,4 +1,4 @@
-import { getSession } from "@/lib/auth";
+import { getUser } from "@/lib/auth";
 import { notFound, redirect } from "next/navigation";
 import AnalyticsMockup from "@/components/analytics";
 import db from "@/lib/db";
@@ -8,15 +8,15 @@ export default async function SiteAnalytics({
 }: {
   params: { id: string };
 }) {
-  const session = await getSession();
-  if (!session) {
+  const user = await getUser();
+  if (!user) {
     redirect("/login");
   }
   const data = await db.query.sites.findFirst({
     where: (sites, { eq }) => eq(sites.id, decodeURIComponent(params.id)),
   });
 
-  if (!data || data.userId !== session.user.id) {
+  if (!data || data.userId !== user.id) {
     notFound();
   }
 

@@ -1,4 +1,4 @@
-import { getSession } from "@/lib/auth";
+import { getUser } from "@/lib/auth";
 import CreateSiteButton from "./create-site-button";
 import CreateSiteModal from "./modal/create-site";
 import Link from "next/link";
@@ -7,14 +7,14 @@ import { sites } from "@/lib/schema";
 import { count, eq } from "drizzle-orm";
 
 export default async function OverviewSitesCTA() {
-  const session = await getSession();
-  if (!session) {
+  const user = await getUser();
+  if (!user) {
     return 0;
   }
   const [sitesResult] = await db
     .select({ count: count() })
     .from(sites)
-    .where(eq(sites.userId, session.user.id));
+    .where(eq(sites.userId, user.id));
 
   return sitesResult.count > 0 ? (
     <Link

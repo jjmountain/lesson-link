@@ -2,7 +2,8 @@
 
 import LoadingDots from "@/components/icons/loading-dots";
 import { cn } from "@/lib/utils";
-import { useSession } from "next-auth/react";
+import { useSessionList } from "@clerk/nextjs";
+
 import { useParams, useRouter } from "next/navigation";
 import { useFormStatus } from "react-dom";
 import { toast } from "sonner";
@@ -33,7 +34,7 @@ export default function Form({
 }) {
   const { id } = useParams() as { id?: string };
   const router = useRouter();
-  const { update } = useSession();
+  const { setActive } = useSessionList();
   return (
     <form
       action={async (data: FormData) => {
@@ -53,7 +54,9 @@ export default function Form({
             if (id) {
               router.refresh();
             } else {
-              await update();
+              if (setActive) {
+                await setActive({ session: res.sessionId });
+              }
               router.refresh();
             }
             toast.success(`Successfully updated ${inputAttrs.name}!`);

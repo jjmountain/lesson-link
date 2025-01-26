@@ -1,6 +1,6 @@
 "use server";
 
-import { getSession } from "@/lib/auth";
+import { getUser } from "@/lib/auth";
 import {
   addDomainToVercel,
   removeDomainFromVercelProject,
@@ -21,8 +21,8 @@ const nanoid = customAlphabet(
 ); // 7-character random string
 
 export const createSite = async (formData: FormData) => {
-  const session = await getSession();
-  if (!session?.user.id) {
+  const user = await getUser();
+  if (!user?.id) {
     return {
       error: "Not authenticated",
     };
@@ -38,7 +38,7 @@ export const createSite = async (formData: FormData) => {
         name,
         description,
         subdomain,
-        userId: session.user.id,
+        userId: user.id,
       })
       .returning();
 
@@ -222,8 +222,8 @@ export const getSiteFromPostId = async (postId: string) => {
 
 export const createPost = withSiteAuth(
   async (_: FormData, site: SelectSite) => {
-    const session = await getSession();
-    if (!session?.user.id) {
+    const user = await getUser();
+    if (!user?.id) {
       return {
         error: "Not authenticated",
       };
@@ -233,7 +233,7 @@ export const createPost = withSiteAuth(
       .insert(posts)
       .values({
         siteId: site.id,
-        userId: session.user.id,
+        userId: user.id,
       })
       .returning();
 
@@ -248,8 +248,8 @@ export const createPost = withSiteAuth(
 
 // creating a separate function for this because we're not using FormData
 export const updatePost = async (data: SelectPost) => {
-  const session = await getSession();
-  if (!session?.user.id) {
+  const user = await getUser();
+  if (!user?.id) {
     return {
       error: "Not authenticated",
     };
@@ -262,7 +262,7 @@ export const updatePost = async (data: SelectPost) => {
     },
   });
 
-  if (!post || post.userId !== session.user.id) {
+  if (!post || post.userId !== user.id) {
     return {
       error: "Post not found",
     };
@@ -391,8 +391,8 @@ export const editUser = async (
   _id: unknown,
   key: string,
 ) => {
-  const session = await getSession();
-  if (!session?.user.id) {
+  const user = await getUser();
+  if (!user?.id) {
     return {
       error: "Not authenticated",
     };
@@ -405,7 +405,7 @@ export const editUser = async (
       .set({
         [key]: value,
       })
-      .where(eq(users.id, session.user.id))
+      .where(eq(users.id, user.id))
       .returning();
 
     return response;

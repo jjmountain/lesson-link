@@ -1,11 +1,11 @@
-import { getSession } from "@/lib/auth";
+import { getUser } from "@/lib/auth";
 import { notFound, redirect } from "next/navigation";
 import Editor from "@/components/editor";
 import db from "@/lib/db";
 
 export default async function PostPage({ params }: { params: { id: string } }) {
-  const session = await getSession();
-  if (!session) {
+  const user = await getUser();
+  if (!user) {
     redirect("/login");
   }
 
@@ -19,7 +19,7 @@ export default async function PostPage({ params }: { params: { id: string } }) {
       },
     },
   });
-  if (!data || data.userId !== session.user.id) {
+  if (!data || data.userId !== user.id) {
     notFound();
   }
 

@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import { getSession } from "@/lib/auth";
+import { getUser } from "@/lib/auth";
 import { notFound, redirect } from "next/navigation";
 import SiteSettingsNav from "./nav";
 import db from "@/lib/db";
@@ -11,15 +11,15 @@ export default async function SiteAnalyticsLayout({
   params: { id: string };
   children: ReactNode;
 }) {
-  const session = await getSession();
-  if (!session) {
+  const user = await getUser();
+  if (!user) {
     redirect("/login");
   }
   const data = await db.query.sites.findFirst({
     where: (sites, { eq }) => eq(sites.id, decodeURIComponent(params.id)),
   });
 
-  if (!data || data.userId !== session.user.id) {
+  if (!data || data.userId !== user.id) {
     notFound();
   }
 
@@ -35,7 +35,7 @@ export default async function SiteAnalyticsLayout({
           href={
             process.env.NEXT_PUBLIC_VERCEL_ENV
               ? `https://${url}`
-              : `http://${data.subdomain}.localhost:3000`
+              : `http://${data.subdomain}.localhost:3001`
           }
           target="_blank"
           rel="noreferrer"
