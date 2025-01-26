@@ -8,40 +8,32 @@ export default function Home() {
     <>
       <main className="flex-1">
         {/* Hero Section */}
-        <div className="w-full bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-amber-100 via-orange-300 to-orange-600">
-          <div className="container mx-auto sm:px-6 lg:px-8 py-16 md:py-24 lg:py-32">
+        <section
+          id="hero-section"
+          className="w-full bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-amber-100 via-orange-300 to-orange-600 pt-28 pb-40"
+        >
+          <div className="container mx-auto px-4 sm:px-6 h-full flex items-center justify-center">
             <div className="flex flex-col items-center space-y-6 text-center">
-              <div className="space-y-4">
-                <h1 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl md:text-6xl max-w-3xl mx-auto">
-                  Transform YouTube Videos into Language Lessons
-                </h1>
-                <p className="mx-auto max-w-2xl text-lg text-orange-900/90 md:text-xl">
-                  Turn any video into an interactive learning experience with AI-generated
-                  exercises, vocabulary lists, and progress tracking - perfect for
-                  language teachers.
-                </p>
-              </div>
-              <div className="flex gap-4">
+              <h1 className="text-4xl font-bold tracking-tight text-slate-700 sm:text-5xl md:text-6xl max-w-3xl mx-auto">
+                Transform YouTube Videos into Language Lessons
+              </h1>
+              <p className="mx-auto max-w-2xl text-lg text-slate-800">
+                Turn any video into an interactive learning experience with AI-generated
+                exercises, vocabulary lists, and progress tracking - perfect for language
+                teachers.
+              </p>
+              <div className="flex gap-4 mt-8">
                 <Button
-                  className="bg-orange-600 text-white hover:bg-orange-700 px-8 py-6 text-lg"
+                  className="bg-white text-orange-600 hover:bg-white/90 px-8 py-6 text-lg"
                   size="lg"
                   asChild
                 >
                   <Link href="/signup">Create Your First Lesson →</Link>
                 </Button>
-                <Button
-                  className="border-2 border-orange-600 text-orange-600 hover:bg-orange-50 px-8 py-6 text-lg"
-                  variant="outline"
-                  size="lg"
-                  asChild
-                >
-                  <Link href="#features">How It Works</Link>
-                </Button>
               </div>
             </div>
           </div>
-        </div>
-
+        </section>
         {/* Features Section */}
         <div className="w-full bg-amber-50">
           <div className="container mx-auto sm:px-6 lg:px-8 py-16 md:py-24">
@@ -93,7 +85,6 @@ export default function Home() {
             </section>
           </div>
         </div>
-
         {/* How It Works Section */}
         <div className="w-full bg-orange-50">
           <div className="container mx-auto sm:px-6 lg:px-8 py-16 md:py-24">
@@ -152,7 +143,6 @@ export default function Home() {
             </section>
           </div>
         </div>
-
         {/* CTA Section */}
         <div className="w-full bg-orange-100">
           <div className="container mx-auto sm:px-6 lg:px-8 py-16 md:py-24">
