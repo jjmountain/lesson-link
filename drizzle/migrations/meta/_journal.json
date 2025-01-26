@@ -15,6 +15,13 @@
       "when": 1737815272507,
       "tag": "0001_moaning_swordsman",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1737893880967,
+      "tag": "0002_nappy_rocket_racer",
+      "breakpoints": true
     }
   ]
 }
