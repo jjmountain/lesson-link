@@ -10,7 +10,7 @@ import { Suspense } from "react";
 import { ReactNode } from "react";
 
 
-export default function LoginPage({ children }: { children: ReactNode }) {
+export default function LoginPage() {
   return (
     <>
           <SignedOut>
@@ -19,8 +19,6 @@ export default function LoginPage({ children }: { children: ReactNode }) {
           <SignedIn>
             <UserButton />
           </SignedIn>
-          {children}
-
 </>
   );
 }
