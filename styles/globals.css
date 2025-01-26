@@ -102,3 +102,41 @@ ul[data-type='taskList'] li[data-checked='true'] > div > p {
   text-decoration: line-through;
   text-decoration-thickness: 2px;
 }
+
+@layer base {
+  :root {
+    --radius: 0.5rem;
+  }
+  html {
+    scroll-behavior: smooth;
+  }
+  
+  /* Backdrop filter support */
+  @supports (backdrop-filter: blur(12px)) {
+    .backdrop-blur {
+      backdrop-filter: blur(12px);
+    }
+  }
+  
+  /* Better button transitions */
+  button {
+    transition: background-color 0.2s ease, transform 0.2s ease;
+  }
+
+    /* Header transitions */
+    .header-transition {
+      transition-property: color, background-color, backdrop-filter;
+      transition-duration: 300ms;
+      transition-timing-function: ease;
+    }
+  
+    /* Initial header state */
+    .header-logo-text {
+      color: white;
+    }
+    
+    /* Scrolled header state */
+    .scrolled .header-logo-text {
+      color: #1a1a1a;
+    }
+}
