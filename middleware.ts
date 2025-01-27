@@ -42,8 +42,6 @@ export default clerkMiddleware(
         return NextResponse.redirect(new URL('/', req.url));
       }
 
-      console.log('going to app');
-      console.log('user id', userId);
       return NextResponse.rewrite(new URL(`/app${path === '/' ? '' : path}`, req.url));
     }
     // rewrite root application to `/home` folder
@@ -52,6 +50,10 @@ export default clerkMiddleware(
       hostname === 'legal-touching-teal.ngrok-free.app' ||
       hostname === process.env.NEXT_PUBLIC_ROOT_DOMAIN
     ) {
+      // If logged in and on root page, redirect to dashboard
+      if (userId && path === '/') {
+        return NextResponse.rewrite(new URL(`/app${path === '/' ? '' : path}`, req.url));
+      }
       return NextResponse.rewrite(new URL(`/home${path === '/' ? '' : path}`, req.url));
     }
 

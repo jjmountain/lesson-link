@@ -2,6 +2,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Video, FileQuestion, LineChart } from 'lucide-react';
+import { SignInButton } from '@clerk/nextjs';
 
 export default function Home() {
   return (
@@ -10,7 +11,7 @@ export default function Home() {
         {/* Hero Section */}
         <section
           id="hero-section"
-          className="w-full bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-amber-100 via-orange-300 to-orange-600 pt-28 pb-40"
+          className="w-full bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-amber-50 via-orange-200 to-orange-400 pt-40 pb-36"
         >
           <div className="container mx-auto px-4 sm:px-6 h-full flex items-center justify-center">
             <div className="flex flex-col items-center space-y-6 text-center">
@@ -24,11 +25,11 @@ export default function Home() {
               </p>
               <div className="flex gap-4 mt-8">
                 <Button
-                  className="bg-white text-orange-600 hover:bg-white/90 px-8 py-6 text-lg"
+                  className="bg-white text-orange-500 hover:bg-white/90 px-8 py-6 text-md font-semibold"
                   size="lg"
                   asChild
                 >
-                  <Link href="/signup">Create Your First Lesson →</Link>
+                  <SignInButton>Create Your First Lesson →</SignInButton>
                 </Button>
               </div>
             </div>
