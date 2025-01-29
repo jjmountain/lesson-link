@@ -14,18 +14,6 @@ export default function Overview() {
         <h1 className="font-cal text-3xl font-bold dark:text-white">Overview</h1>
         <OverviewStats />
       </div> */}
-      <ClerkLoading>
-        <div className="relative rounded-lg w-[500px] shadow-md transition-all">
-          <div className="h-[30px] w-full animate-pulse bg-stone-100" />
-        </div>
-      </ClerkLoading>
-      <OrganizationSwitcher
-        appearance={{
-          elements: {
-            rootBox: 'flex',
-          },
-        }}
-      />
 
       <div className="flex flex-col space-y-6">
         <div className="flex items-center justify-between">

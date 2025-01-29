@@ -1,10 +1,18 @@
 import { NextResponse } from 'next/server';
-import { clerkMiddleware } from '@clerk/nextjs/server';
+import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
+
+const isOnboardingRoute = createRouteMatcher(['/onboarding']);
+const isPublicRoute = createRouteMatcher(['/home']);
+const isPublicAppRoute = createRouteMatcher(['/login']);
 
 export default clerkMiddleware(
   async (auth, req) => {
     // Skip auth for webhook routes
     if (req.nextUrl.pathname.startsWith('/api/webhooks')) {
+      return NextResponse.next();
+    }
+
+    if (isOnboardingRoute(req)) {
       return NextResponse.next();
     }
 
@@ -14,12 +22,6 @@ export default clerkMiddleware(
     let hostname = req.headers
       .get('host')!
       .replace('.localhost:3001', `.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`);
-
-    console.log('Middleware request:', {
-      hostname,
-      path: req.nextUrl.pathname,
-      fullUrl: req.url,
-    });
 
     // special case for Vercel preview deployment URLs
     if (
@@ -33,27 +35,32 @@ export default clerkMiddleware(
     // Get the pathname of the request (e.g. /, /about, /blog/first-post)
     const path = `${url.pathname}${searchParams.length > 0 ? `?${searchParams}` : ''}`;
 
-    const { userId } = await auth();
+    const { userId, sessionClaims, redirectToSignIn } = await auth();
+
+    // For users visiting /onboarding, don't try to redirect
+    if (userId && isOnboardingRoute(req)) {
+      return NextResponse.next();
+    }
+
     // If user is logged out and trying to access app, redirect to login
     if (hostname == `app.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`) {
-      if (!userId && path !== '/login') {
-        return NextResponse.redirect(new URL('/login', req.url));
+      if (!userId && !isPublicAppRoute(req)) {
+        return redirectToSignIn({ returnBackUrl: req.url });
       } else if (userId && path === '/login') {
+        // if the user is logged in and tries to access the login page, redirect to home (using request url)
         return NextResponse.redirect(new URL('/', req.url));
       }
 
+      console.log('going to app');
+      console.log('user id', userId);
       return NextResponse.rewrite(new URL(`/app${path === '/' ? '' : path}`, req.url));
     }
-    // rewrite root application to `/home` folder
+    // rewrite root application to `/home` folder for all routes except `/login`
     if (
       hostname === 'localhost:3001' ||
       hostname === 'legal-touching-teal.ngrok-free.app' ||
       hostname === process.env.NEXT_PUBLIC_ROOT_DOMAIN
     ) {
-      // If logged in and on root page, redirect to dashboard
-      if (userId && path === '/') {
-        return NextResponse.rewrite(new URL(`/app${path === '/' ? '' : path}`, req.url));
-      }
       return NextResponse.rewrite(new URL(`/home${path === '/' ? '' : path}`, req.url));
     }
 

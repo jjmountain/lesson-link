@@ -18,7 +18,7 @@ export default function ClientHeader() {
   const textColor = useTransform(scrollY, (val) => {
     if (!heroRef.current) return '#1a1a1a';
     const heroHeight = heroRef.current.offsetHeight;
-    return val > heroHeight * 0.8 ? '#ea580c' : '#1a1a1a';
+    return val > heroHeight * 0.8 ? '#ea580c' : '#334154';
   });
 
   const headerBg = useTransform(scrollY, (val) => {
@@ -42,8 +42,8 @@ export default function ClientHeader() {
         transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
       }}
     >
-      <div className="mx-auto px-4 sm:px-6 w-full">
-        <div className="flex h-14 items-center justify-between w-full">
+      <div className="mx-auto px-4 sm:px-6">
+        <div className="flex h-14 items-center justify-between">
           <Link className="flex items-center space-x-2" href="/">
             <Image
               src="/logo.png"

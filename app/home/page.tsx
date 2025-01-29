@@ -2,7 +2,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Video, FileQuestion, LineChart } from 'lucide-react';
-import { SignInButton } from '@clerk/nextjs';
+import { redirect } from 'next/navigation';
 
 export default function Home() {
   return (
@@ -11,7 +11,7 @@ export default function Home() {
         {/* Hero Section */}
         <section
           id="hero-section"
-          className="w-full bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-amber-50 via-orange-200 to-orange-400 pt-40 pb-36"
+          className="w-full bg-[linear-gradient(to_bottom,_var(--tw-gradient-stops))] from-amber-50 via-orange-200 to-orange-400 pt-40 pb-36"
         >
           <div className="container mx-auto px-4 sm:px-6 h-full flex items-center justify-center">
             <div className="flex flex-col items-center space-y-6 text-center">
@@ -20,8 +20,7 @@ export default function Home() {
               </h1>
               <p className="mx-auto max-w-2xl text-lg text-slate-800">
                 Turn any video into an interactive learning experience with AI-generated
-                exercises, vocabulary lists, and progress tracking - perfect for language
-                teachers.
+                exercises, vocabulary lists, and progress tracking
               </p>
               <div className="flex gap-4 mt-8">
                 <Button
@@ -29,7 +28,9 @@ export default function Home() {
                   size="lg"
                   asChild
                 >
-                  <SignInButton>Create Your First Lesson →</SignInButton>
+                  <Link href={`${process.env.NEXT_PUBLIC_APP_URL}/login`}>
+                    Create Your First Lesson →
+                  </Link>
                 </Button>
               </div>
             </div>
@@ -154,9 +155,9 @@ export default function Home() {
                     <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl">
                       Ready to Transform Your Teaching?
                     </h2>
-                    <p className="mx-auto max-w-[700px] text-gray-600 md:text-xl">
+                    <p className="mx-auto max-w-[700px] text-gray-600 md:text-md py-2">
                       Join thousands of teachers using Lesson Link to create engaging,
-                      interactive lessons.
+                      interactive lessons
                     </p>
                   </div>
                   <Button
@@ -194,7 +195,7 @@ export default function Home() {
             <div className="flex gap-8">
               <div className="space-y-2">
                 <h4 className="font-semibold">Product</h4>
-                <nav className="space-y-1">
+                <nav className="space-y-1 flex-col flex">
                   <Link
                     href="#features"
                     className="text-sm text-gray-600 hover:text-orange-600"
@@ -217,7 +218,7 @@ export default function Home() {
               </div>
               <div className="space-y-2">
                 <h4 className="font-semibold">Company</h4>
-                <nav className="space-y-1">
+                <nav className="space-y-1 flex-col flex">
                   <Link
                     href="/about"
                     className="text-sm text-gray-600 hover:text-orange-600"

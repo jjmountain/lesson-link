@@ -10,9 +10,12 @@ export async function getSiteData(domain: string) {
     ? domain.replace(`.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`, '')
     : null;
 
+  console.log('Getting site data for domain:', domain);
+  console.log('Subdomain:', subdomain);
+
   return await unstable_cache(
     async () => {
-      return await db.query.sites.findFirst({
+      const siteData = await db.query.sites.findFirst({
         where: subdomain
           ? eq(sites.subdomain, subdomain)
           : eq(sites.customDomain, domain),
@@ -20,6 +23,13 @@ export async function getSiteData(domain: string) {
           user: true,
         },
       });
+
+      if (!siteData) {
+        console.error('No site data found for domain:', domain);
+        return null; // or throw an error if necessary
+      }
+
+      return siteData; // Ensure this is a valid JSON object
     },
     [`${domain}-metadata`],
     {

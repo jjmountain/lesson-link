@@ -1,14 +1,5 @@
-import { SignInButton, SignedIn, SignedOut, UserButton } from '@clerk/nextjs';
+import { SignIn } from '@clerk/nextjs';
 
 export default function LoginPage() {
-  return (
-    <>
-      <SignedOut>
-        <SignInButton />
-      </SignedOut>
-      <SignedIn>
-        <UserButton />
-      </SignedIn>
-    </>
-  );
+  return <SignIn />;
 }
