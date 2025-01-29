@@ -2,17 +2,12 @@ import { NextResponse } from 'next/server';
 import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
 
 const isOnboardingRoute = createRouteMatcher(['/onboarding']);
-const isPublicRoute = createRouteMatcher(['/home']);
-const isPublicAppRoute = createRouteMatcher(['/login']);
+const isPublicRoute = createRouteMatcher(['/home', '/login']);
 
 export default clerkMiddleware(
   async (auth, req) => {
     // Skip auth for webhook routes
     if (req.nextUrl.pathname.startsWith('/api/webhooks')) {
-      return NextResponse.next();
-    }
-
-    if (isOnboardingRoute(req)) {
       return NextResponse.next();
     }
 
@@ -42,17 +37,26 @@ export default clerkMiddleware(
       return NextResponse.next();
     }
 
+    // If the user isn't signed in and the route is private, redirect to sign-in
+    if (!userId && !isPublicRoute(req))
+      return redirectToSignIn({ returnBackUrl: req.url });
+
     // If user is logged out and trying to access app, redirect to login
     if (hostname == `app.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`) {
-      if (!userId && !isPublicAppRoute(req)) {
+      if (!userId && !isPublicRoute(req)) {
         return redirectToSignIn({ returnBackUrl: req.url });
       } else if (userId && path === '/login') {
         // if the user is logged in and tries to access the login page, redirect to home (using request url)
         return NextResponse.redirect(new URL('/', req.url));
       }
 
-      console.log('going to app');
-      console.log('user id', userId);
+      // Catch users who do not have `onboardingComplete: true` in their publicMetadata
+      // Redirect them to the /onboading route to complete onboarding
+      if (userId && !sessionClaims?.metadata?.onboardingComplete) {
+        const onboardingUrl = new URL('/onboarding', req.url);
+        return NextResponse.redirect(onboardingUrl);
+      }
+
       return NextResponse.rewrite(new URL(`/app${path === '/' ? '' : path}`, req.url));
     }
     // rewrite root application to `/home` folder for all routes except `/login`
