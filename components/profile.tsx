@@ -32,7 +32,7 @@ export default async function Profile() {
         </span>
       </Link>
       <div className="text-sm font-medium">
-        <SignOutButton>
+        <SignOutButton redirectUrl="/login">
           <LogOut className="hover:cursor-pointer hover:bg-orange-100" />
         </SignOutButton>
       </div>

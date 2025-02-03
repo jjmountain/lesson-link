@@ -20,17 +20,17 @@ const nanoid = customAlphabet(
   7,
 ); // 7-character random string
 
-export const createSite = async (formData: FormData) => {
-  const user = await getUser();
-  if (!user?.id) {
-    return {
-      error: 'Not authenticated',
-    };
-  }
-  const name = formData.get('name') as string;
-  const description = formData.get('description') as string;
-  const subdomain = formData.get('subdomain') as string;
-
+export const createSite = async ({
+  name,
+  description,
+  subdomain,
+  userId,
+}: {
+  name: string;
+  description?: string;
+  subdomain: string;
+  userId: string;
+}): Promise<{ error: string } | SelectSite> => {
   try {
     const [response] = await db
       .insert(sites)
@@ -38,7 +38,7 @@ export const createSite = async (formData: FormData) => {
         name,
         description,
         subdomain,
-        userId: user.id,
+        userId: userId,
       })
       .returning();
 

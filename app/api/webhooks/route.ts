@@ -3,6 +3,8 @@ import { headers } from 'next/headers';
 import { WebhookEvent } from '@clerk/nextjs/server';
 import db from '@/lib/db';
 import { users } from '@/lib/schema';
+import { eq } from 'drizzle-orm';
+import { createSite } from '@/lib/actions';
 
 export async function POST(req: Request) {
   const SIGNING_SECRET = process.env.SIGNING_SECRET;
@@ -81,6 +83,15 @@ export async function POST(req: Request) {
     } catch (error) {
       console.error('Error syncing user:', error);
     }
+  } else if (evt.type === 'user.updated') {
+    console.log('user updated');
+    console.log('data', evt.data);
+    await db
+      .update(users)
+      .set({
+        slug: evt.data.public_metadata.slug as string,
+      })
+      .where(eq(users.id, evt.data.id));
   }
 
   return new Response('Webhook received', { status: 200 });

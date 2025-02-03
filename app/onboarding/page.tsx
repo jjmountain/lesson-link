@@ -32,9 +32,14 @@ export default function OnboardingComponent() {
         </div>
 
         <div>
-          <label>Application Type</label>
-          <p>Describe the type of your application.</p>
-          <input type="text" name="applicationType" required />
+          <label>Slug</label>
+          <p>Enter the subdomain for your application.</p>
+          <input type="text" name="slug" required />
+        </div>
+        <div>
+          <label>Description</label>
+          <p>Enter the description for your application.</p>
+          <input type="text" name="description" required />
         </div>
         {error && <p className="text-red-600">Error: {error}</p>}
         <button type="submit">Submit</button>

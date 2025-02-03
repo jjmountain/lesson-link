@@ -10,6 +10,7 @@ import {
   text,
   timestamp,
   uniqueIndex,
+  varchar,
 } from 'drizzle-orm/pg-core';
 
 export const users = pgTable('users', {
@@ -26,6 +27,7 @@ export const users = pgTable('users', {
   updatedAt: timestamp('updatedAt', { mode: 'date' })
     .notNull()
     .$onUpdate(() => new Date()),
+  slug: varchar('slug', { length: 39 }).unique(),
 });
 
 export const sessions = pgTable(
@@ -104,7 +106,7 @@ export const sites = pgTable(
     id: text('id')
       .primaryKey()
       .$defaultFn(() => createId()),
-    name: text('name'),
+    name: text('name').notNull(),
     description: text('description'),
     logo: text('logo').default(
       'https://public.blob.vercel-storage.com/eEZHAoPTOBSYGBE3/JRajRyC-PhBHEinQkupt02jqfKacBVHLWJq7Iy.png',

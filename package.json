@@ -2,7 +2,10 @@
   "private": true,
   "scripts": {
     "dev": "next dev -p 3001",
+    "generate": "drizzle-kit generate",
+    "migrate": "drizzle-kit migrate",
     "build": "drizzle-kit push && next build",
+    "push": "drizzle-kit push",
     "start": "next start",
     "lint": "next lint",
     "type-check": "tsc --noEmit",
